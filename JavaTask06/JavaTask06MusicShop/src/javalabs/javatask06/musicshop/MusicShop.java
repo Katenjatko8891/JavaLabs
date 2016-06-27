@@ -19,31 +19,13 @@ public class MusicShop {
 
     public List<MusicalInstrument> prepareInstruments(Map<String, Integer> order){
         orderTest(order);
-        Integer value = order.get(MusicalInstrument.GUITAR);
-        if (value != null) {
+        Set<String> keySetOrder = order.keySet();
+
+        for (String nameOrderInstrument: keySetOrder) {
+            Integer value = order.get(nameOrderInstrument);
             Iterator<MusicalInstrument> iter = musicalInstruments.iterator();
             while (value != 0) {
-                if (iter.next() instanceof Guitar) {
-                    iter.remove();
-                    value--;
-                }
-           }
-        }
-        value = order.get(MusicalInstrument.PIANO);
-        if (value != null) {
-            Iterator<MusicalInstrument> iter = musicalInstruments.iterator();
-            while (value != 0) {
-                if (iter.next() instanceof Piano) {
-                   iter.remove();
-                   value--;
-                }
-            }
-        }
-        value = order.get(MusicalInstrument.TUBE);
-        if (value != null) {
-            Iterator<MusicalInstrument> iter = musicalInstruments.iterator();
-            while (value != 0) {
-                if (iter.next() instanceof Tube) {
+                if (iter.next().getClass().getSimpleName().equalsIgnoreCase(nameOrderInstrument)) {
                     iter.remove();
                     value--;
                 }
@@ -63,38 +45,35 @@ public class MusicShop {
             }
         }
         Map<String, Integer> musicShopInstruments = countsOfInstrumentsOfParticularType();
-        if ((order.get(MusicalInstrument.GUITAR) != null && (order.get(MusicalInstrument.GUITAR) > musicShopInstruments.get(MusicalInstrument.GUITAR))) ||
-                (order.get(MusicalInstrument.TUBE) != null && (order.get(MusicalInstrument.TUBE) > musicShopInstruments.get(MusicalInstrument.TUBE))) ||
-                (order.get(MusicalInstrument.PIANO) != null && (order.get(MusicalInstrument.PIANO) > musicShopInstruments.get(MusicalInstrument.PIANO)))) {
-            throw new IllegalArgumentException("Value of instruments in order can not be bigger then amount in shop!");
-        }
-        Set<String> keySet = order.keySet();
-        for (String name: keySet) {
-            if (!name.equalsIgnoreCase(MusicalInstrument.GUITAR) && !name.equalsIgnoreCase(MusicalInstrument.TUBE) && !name.equalsIgnoreCase(MusicalInstrument.PIANO)) {
+        Set<String> keySetOrder = order.keySet();
+        String myPackage = MusicalInstrument.class.getPackage().getName();
+
+        for (String nameOrderInstrument: keySetOrder) {
+            try {
+                Class.forName(myPackage + "." + nameOrderInstrument);
+            } catch (ClassNotFoundException e) {
                 throw new WrongKeyValueOfInstrumentException();
+            }
+            if ((musicShopInstruments.get(nameOrderInstrument) == null) ||
+                (order.get(nameOrderInstrument) > musicShopInstruments.get(nameOrderInstrument))) {
+                    throw new IllegalArgumentException("Value of instruments in order can not be bigger then amount in shop!");
             }
         }
     }
 
+
     private Map<String, Integer> countsOfInstrumentsOfParticularType() {
         Map<String, Integer> countOfInstruments = new HashMap<>();
-        Integer guitars = 0;
-        Integer tubes = 0;
-        Integer pianos = 0;
+
         for (MusicalInstrument instrument: musicalInstruments) {
-            if (instrument instanceof Guitar) {
-                guitars++;
-            }
-            if (instrument instanceof Tube) {
-                tubes++;
-            }
-            if (instrument instanceof Piano) {
-                pianos++;
-            }
+                String className = instrument.getClass().getSimpleName();
+                   if (countOfInstruments.containsKey(className)) {
+                       countOfInstruments.put(className, new Integer(countOfInstruments.get(className) + 1));
+                   }
+                    else {
+                       countOfInstruments.put(className, 1);
+                   }
         }
-        countOfInstruments.put(MusicalInstrument.GUITAR, guitars);
-        countOfInstruments.put(MusicalInstrument.PIANO, pianos);
-        countOfInstruments.put(MusicalInstrument.TUBE, tubes);
         return countOfInstruments;
     }
 

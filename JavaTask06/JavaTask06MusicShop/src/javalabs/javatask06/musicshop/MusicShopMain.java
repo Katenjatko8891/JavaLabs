@@ -14,9 +14,9 @@ public class MusicShopMain {
         System.out.println(test.toString());
 
         Map<String, Integer> testMap = new HashMap<>();
-        testMap.put(MusicalInstrument.PIANO, 1);
-        testMap.put(MusicalInstrument.TUBE, 1);
-        testMap.put(MusicalInstrument.GUITAR, 1);
+        testMap.put("Piano", 1);
+        testMap.put("Tube", 1);
+        testMap.put("Guitar", 1);
 
         test.prepareInstruments(testMap);
 
